@@ -7,28 +7,32 @@ on:
     branches: [ "main" ]
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v4
-        - name: Set up Go
-          uses: actions/setup-go@v4
-          with:
-              go-version: '1.20'
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
 
-        - name: Build-DB
-          run: docker-compose build
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20'
 
-        - name: Create-DB
-          run: docker-compose up -d
+    - name: Install Docker Compose
+      run: sudo apt-get update && sudo apt-get install -y docker-compose
 
-        - name: Test
-          run: go test -v main_test.go
+    - name: Build-DB
+      run: docker-compose build
 
-    build: 
-      needs: test
-      runs-on: ubuntu-latest
-      steps:
-      - uses: actions/checkout@v4
-      - name: Build
-        run: go build -v main.go
+    - name: Create-DB
+      run: docker-compose up -d
+
+    - name: Test
+      run: go test -v main_test.go
+
+  build: 
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      run: go build -v main.go
